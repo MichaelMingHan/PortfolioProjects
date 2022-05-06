@@ -1,3 +1,5 @@
+--Queries used for Tableau Project 
+
 --Verify if table was imported correctly
 Select*
   From `sublime-lodge-341319.SQLPortfolio.Covid_death`
@@ -60,11 +62,4 @@ Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinatio
 )
 
 
-  
-
-
-
-
-
-
-
+ 
