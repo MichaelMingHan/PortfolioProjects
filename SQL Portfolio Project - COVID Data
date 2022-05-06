@@ -1,0 +1,70 @@
+--Verify if table was imported correctly
+Select*
+  From `sublime-lodge-341319.SQLPortfolio.Covid_death`
+  Order by 3,4;
+
+Select*
+  From `sublime-lodge-341319.SQLPortfolio.Covid_vaccination`
+  Order by 3,4 ;
+
+--Looking at Total Cases vs Population in Canada
+Select location, date, population, total_cases, (total_cases/population)*100 as Percent_Infected
+  FROM `sublime-lodge-341319.SQLPortfolio.Covid_death`
+  WHERE location = 'Canada'
+  Order by 1,2;
+
+
+--Looking at Country's Highest Infection Count
+Select location, population, MAX(total_cases) as Highest_Infection_Count, MAX((total_cases/population))*100 as Percent_Infected
+  FROM `sublime-lodge-341319.SQLPortfolio.Covid_death`
+  GROUP BY location, population
+  Order by Percent_Infected desc;
+
+--Looking at Countries with the Highest Death Cout Per Population
+--Changing data type using Cast
+Select Location, population, Max(Cast(total_cases AS int))as Total_Cases, Max(CAST(total_deaths as int))as Total_Death_Count
+  FROM  `sublime-lodge-341319.SQLPortfolio.Covid_death`
+  Where continent is not null
+  Group BY location, population
+  Order by Total_Death_Count desc;
+
+--Looking at it by World Wide
+Select SUM(new_cases) as Total_Cases, SUM(cast(new_deaths as int)) as Total_Deaths, SUM(cast(new_deaths as int))/SUM(new_cases)*100 as Death_Percentage
+  FROM `sublime-lodge-341319.SQLPortfolio.Covid_death`
+  Where Continent is not null
+
+--Joining Tables
+--Looking at Total Pupulation vs Vaccinations
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
+  --adding accumulating sum
+  SUM(cast(vac.new_vaccinations as int)) OVER(partition by dea.location ORder By dea.location, dea.date) AS Rolling_People_Vaccinated
+  From `sublime-lodge-341319.SQLPortfolio.Covid_death`as dea
+  JOIN `sublime-lodge-341319.SQLPortfolio.Covid_vaccination`as vac
+    On dea.location = vac.location
+    and dea.date = vac.date
+  Where dea.continent is not NULL and new_vaccinations is not Null
+  Order By 2,3;
+
+
+--Using CTE
+WITH PopulationVSVaccination(Continent, Location, Date, Population, New_Vaccinations, Rolling_People_Vaccinated) as
+(
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
+  --adding accumulating sum
+  SUM(cast(vac.new_vaccinations as int)) OVER(partition by dea.location ORder By dea.location, dea.date) AS Rolling_People_Vaccinated
+  From `sublime-lodge-341319.SQLPortfolio.Covid_death`as dea
+  JOIN `sublime-lodge-341319.SQLPortfolio.Covid_vaccination`as vac
+    On dea.location = vac.location
+    and dea.date = vac.date
+  Where dea.continent is not NULL and new_vaccinations is not Null
+)
+
+
+  
+
+
+
+
+
+
+
